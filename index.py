@@ -1,18 +1,14 @@
 #!C:\Users\dnjsw\Anaconda3\python.exe
 print("content-type:text/html; charset=UTF-8\n")
 
-import cgi, os
-
-#data dir에 있는 값들을 가져옴
-files = os.listdir('data')
-listStr = ''
-for item in files:
-    listStr += '<li><a href="index.py?id={name}">{name}</a></li>'.format(name=item)
+import cgi, os, view
 
 form = cgi.FieldStorage()
 if 'id' in form:
     pageId = form["id"].value
     description = open('data/' + pageId ,'r').read()
+    description = description.replace('<','&lt;')
+    description = description.replace('>','&gt;')
     updata_link = '<a href="update.py?id={}">update</a>'.format(pageId)
     delete_action = '''
         <form action = "process_delete.py" method = "post">
@@ -47,6 +43,9 @@ print(
   <p>{desc}</p>
 </body>
 </html>
-'''.format(title=pageId, desc = description, listStr = listStr,
-update_link=updata_link, delete_action=delete_action)
+'''.format(title=pageId,
+            desc = description,
+            listStr = view.getList(),
+            update_link=updata_link,
+            delete_action=delete_action)
 )
