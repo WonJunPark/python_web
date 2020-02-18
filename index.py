@@ -1,14 +1,16 @@
 #!C:\Users\dnjsw\Anaconda3\python.exe
 print("content-type:text/html; charset=UTF-8\n")
 
-import cgi, os, view
+import cgi, os, view, html_sanitizer
+
+sanitizer = html_sanitizer.Sanitizer()
 
 form = cgi.FieldStorage()
 if 'id' in form:
-    pageId = form["id"].value
+    title = pageId = form["id"].value
     description = open('data/' + pageId ,'r').read()
-    description = description.replace('<','&lt;')
-    description = description.replace('>','&gt;')
+    title = sanitizer.sanitize(title)
+    description = sanitizer.sanitize(description)
     updata_link = '<a href="update.py?id={}">update</a>'.format(pageId)
     delete_action = '''
         <form action = "process_delete.py" method = "post">
@@ -44,7 +46,7 @@ print(
 </body>
 </html>
 '''.format(title=pageId,
-            desc = description,
+            desc = title,
             listStr = view.getList(),
             update_link=updata_link,
             delete_action=delete_action)
